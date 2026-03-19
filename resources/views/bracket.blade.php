@@ -300,11 +300,11 @@ const RAW_WOMEN = {
 // Region display labels per gender
 const REGION_LABELS = {
   men:   { east:'EAST', west:'WEST', south:'SOUTH', midwest:'MIDWEST' },
-  women: { east:'EAST', west:'WEST', south:'SOUTH', midwest:'MIDWEST' }
+  women: { east:'FORT WORTH 1', west:'SACRAMENTO 4', south:'SACRAMENTO 2', midwest:'FORT WORTH 3' }
 };
 const FF_LABELS = {
   men:   ['East vs West', 'South vs Midwest'],
-  women: ['East vs West', 'South vs Midwest']
+  women: ['Fort Worth 1 vs Sacramento 4', 'Sacramento 2 vs Fort Worth 3']
 };
 
 // ===================== THEME =====================
