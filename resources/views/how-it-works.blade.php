@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How It Works — 2026 NCAA Bracket</title>
+<title>How It Works — 2026 NCAA Brackets</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', sans-serif; background: #0a0e1a; color: #e0e6f0; min-height: 100vh; line-height: 1.7; }
@@ -64,15 +64,24 @@ h1 { text-align: center; padding: 32px 20px 8px; color: #f0b429; font-size: 1.5e
 </nav>
 
 <h1>📖 How It Works</h1>
-<p class="subtitle">A plain-English breakdown of how this bracket simulator predicts games</p>
+<p class="subtitle">A plain-English breakdown of how this bracket simulator predicts games — for both the Men's and Women's tournaments</p>
 
 <div class="container">
 
   <!-- Overview -->
   <div class="section">
     <h2>Overview</h2>
-    <p>This simulator uses a statistical model to predict the outcome of every game in the 2026 NCAA Men's Basketball Tournament. It is not a crystal ball — it's a probability engine. Every time you click <strong>Re-Simulate</strong>, a new bracket is generated based on each team's odds of winning each individual game.</p>
-    <p>The model combines three signals to estimate how strong each team is: their win percentage, their seed (how tournament selectors ranked them), and a small random upset factor that reflects the unpredictability of March Madness.</p>
+    <p>This simulator uses a statistical model to predict the outcome of every game in both the 2026 NCAA Men's and Women's Basketball Tournaments. It is not a crystal ball — it's a probability engine. Every time you click <strong>Re-Simulate</strong>, a new bracket is generated based on each team's odds of winning each individual game.</p>
+    <p>The model combines three signals to estimate how strong each team is: their win percentage, their seed (how tournament selectors ranked them), and a small random upset factor that reflects the unpredictability of March Madness. The same model runs for both brackets — only the team data changes.</p>
+    <div class="tip-box" style="margin-top:16px;">
+      <h3>Men's vs Women's bracket</h3>
+      <ul>
+        <li><strong>Men's bracket</strong> uses East, West, South, and Midwest regions — the traditional NCAA structure.</li>
+        <li><strong>Women's bracket</strong> uses East, West, South, and Midwest regions — matching the actual 2026 Women's Tournament field hosted across Fort Worth and Sacramento.</li>
+        <li>Both brackets run the same Elo simulation, upset logic, and championship odds engine — the numbers are directly comparable across genders.</li>
+        <li>Toggle between Men's and Women's using the <strong>♂ Men / ♀ Women</strong> buttons on the bracket page. Odds are calculated and cached separately for each.</li>
+      </ul>
+    </div>
   </div>
 
   <!-- Model Weights -->
@@ -171,6 +180,18 @@ h1 { text-align: center; padding: 32px 20px 8px; color: #f0b429; font-size: 1.5e
         <li><strong>Avoid the perfect bracket trap:</strong> Picking all favorites gives you a statistically boring bracket. One or two smart upsets (backed by high Elo mid-majors) scores better in pools.</li>
       </ul>
     </div>
+  </div>
+
+  <!-- Women's specific notes -->
+  <div class="section">
+    <h2>Women's Tournament — What's Different</h2>
+    <p>The Women's bracket runs the exact same model as the Men's, but the field looks different in a few key ways:</p>
+    <ul>
+      <li><strong>Dominant 1-seeds:</strong> South Carolina (31-2) and UConn (30-3) have significantly higher Elos than most of the field, giving them outsized championship odds compared to what you'd see in the more balanced Men's bracket.</li>
+      <li><strong>Compressed talent gap:</strong> The Elo spread between seeds 1–4 in the Women's field is wider than in the Men's, meaning upsets are statistically less likely to survive into the later rounds.</li>
+      <li><strong>Same upset thresholds:</strong> The model applies the same 14–20% upset probabilities for the same seed gaps in Rounds 1 and 2 — women's basketball has historically seen a similar rate of early-round surprises.</li>
+      <li><strong>Independent odds:</strong> When you run Championship Odds, each bracket runs 2,000 separate simulations. Switching from Men's to Women's (or back) restores that bracket's previously computed odds without re-running them.</li>
+    </ul>
   </div>
 
   <!-- Limitations -->
