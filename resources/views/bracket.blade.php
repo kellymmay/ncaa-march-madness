@@ -300,11 +300,11 @@ const RAW_WOMEN = {
 // Region display labels per gender
 const REGION_LABELS = {
   men:   { east:'EAST', west:'WEST', south:'SOUTH', midwest:'MIDWEST' },
-  women: { east:'FORT WORTH 1', west:'SACRAMENTO 4', south:'SACRAMENTO 2', midwest:'FORT WORTH 3' }
+  women: { east:'EAST', west:'WEST', south:'SOUTH', midwest:'MIDWEST' }
 };
 const FF_LABELS = {
   men:   ['East vs West', 'South vs Midwest'],
-  women: ['Fort Worth 1 vs Sacramento 4', 'Sacramento 2 vs Fort Worth 3']
+  women: ['East vs West', 'South vs Midwest']
 };
 
 // ===================== THEME =====================
@@ -456,6 +456,10 @@ function setView(v) {
 }
 
 // ===================== BRACKET RENDER =====================
+// Cell-based layout: each game sits in a cell whose height doubles each round,
+// guaranteeing every game is centered between the two games that feed into it.
+const CELL_H = 72; // px — base cell height for Round 1
+
 function slotEl(t, win) {
   const d = document.createElement("div");
   d.className = "team-slot" + (win ? (t.upset ? " upset-winner" : " winner") : " loser");
@@ -468,17 +472,23 @@ function gameEl(g) {
   d.appendChild(slotEl(g.winner, true)); d.appendChild(slotEl(g.loser, false));
   return d;
 }
+function gameCell(g, level) {
+  const h = CELL_H * Math.pow(2, level);
+  const cell = document.createElement("div");
+  cell.style.cssText = `height:${h}px; display:flex; flex-direction:column; justify-content:center; flex-shrink:0;`;
+  cell.appendChild(gameEl(g));
+  return cell;
+}
 function hdr(txt) { const d=document.createElement("div"); d.className="round-header"; d.textContent=txt; return d; }
-function sp(h) { const d=document.createElement("div"); d.style.height=h+"px"; return d; }
 function regDiv(txt) { const d=document.createElement("div"); d.className="reg-div"; d.textContent=txt; return d; }
 
-function buildSideCol(hdrTxt, topGames, topSp, topGap, botGames, botSp, botGap, topLbl, botLbl) {
+function buildSideCol(hdrTxt, topGames, topLevel, botGames, botLevel, topLbl, botLbl) {
   const col = document.createElement("div"); col.className="round-col";
   col.appendChild(hdr(hdrTxt));
-  col.appendChild(regDiv(topLbl)); col.appendChild(sp(topSp));
-  topGames.forEach((g,i) => { col.appendChild(gameEl(g)); if(i<topGames.length-1) col.appendChild(sp(topGap)); });
-  col.appendChild(regDiv(botLbl)); col.appendChild(sp(botSp));
-  botGames.forEach((g,i) => { col.appendChild(gameEl(g)); if(i<botGames.length-1) col.appendChild(sp(botGap)); });
+  col.appendChild(regDiv(topLbl));
+  topGames.forEach(g => col.appendChild(gameCell(g, topLevel)));
+  col.appendChild(regDiv(botLbl));
+  botGames.forEach(g => col.appendChild(gameCell(g, botLevel)));
   return col;
 }
 
@@ -489,16 +499,16 @@ function renderBracket(sim, ff1, ff2, champ) {
   const full = document.createElement("div"); full.className="full-bracket";
 
   const left = document.createElement("div"); left.className="side";
-  left.appendChild(buildSideCol("1st Round", sim.east.r1,   0,4,   sim.south.r1,   6,4,   rl.east, rl.south));
-  left.appendChild(buildSideCol("2nd Round", sim.east.r2,   26,10, sim.south.r2,   32,10, rl.east, rl.south));
-  left.appendChild(buildSideCol("Sweet 16",  sim.east.s16,  68,22, sim.south.s16,  74,22, rl.east, rl.south));
-  left.appendChild(buildSideCol("Elite 8",   sim.east.e8,   148,0, sim.south.e8,   154,0, rl.east, rl.south));
+  left.appendChild(buildSideCol("1st Round", sim.east.r1,  0, sim.south.r1,  0, rl.east, rl.south));
+  left.appendChild(buildSideCol("2nd Round", sim.east.r2,  1, sim.south.r2,  1, rl.east, rl.south));
+  left.appendChild(buildSideCol("Sweet 16",  sim.east.s16, 2, sim.south.s16, 2, rl.east, rl.south));
+  left.appendChild(buildSideCol("Elite 8",   sim.east.e8,  3, sim.south.e8,  3, rl.east, rl.south));
 
   const right = document.createElement("div"); right.className="side right";
-  right.appendChild(buildSideCol("1st Round", sim.west.r1,    0,4,   sim.midwest.r1,    6,4,   rl.west, rl.midwest));
-  right.appendChild(buildSideCol("2nd Round", sim.west.r2,    26,10, sim.midwest.r2,    32,10, rl.west, rl.midwest));
-  right.appendChild(buildSideCol("Sweet 16",  sim.west.s16,   68,22, sim.midwest.s16,   74,22, rl.west, rl.midwest));
-  right.appendChild(buildSideCol("Elite 8",   sim.west.e8,    148,0, sim.midwest.e8,    154,0, rl.west, rl.midwest));
+  right.appendChild(buildSideCol("1st Round", sim.west.r1,    0, sim.midwest.r1,    0, rl.west, rl.midwest));
+  right.appendChild(buildSideCol("2nd Round", sim.west.r2,    1, sim.midwest.r2,    1, rl.west, rl.midwest));
+  right.appendChild(buildSideCol("Sweet 16",  sim.west.s16,   2, sim.midwest.s16,   2, rl.west, rl.midwest));
+  right.appendChild(buildSideCol("Elite 8",   sim.west.e8,    3, sim.midwest.e8,    3, rl.west, rl.midwest));
 
   const center = document.createElement("div"); center.className="center-col";
   const ffLbl = document.createElement("div"); ffLbl.className="ff-label"; ffLbl.textContent="🏟️ FINAL FOUR";
