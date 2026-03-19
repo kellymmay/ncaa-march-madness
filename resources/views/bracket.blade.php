@@ -7,13 +7,42 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', sans-serif; background: #0a0e1a; color: #e0e6f0; min-height: 100vh; }
-h1 { text-align: center; padding: 18px 10px 4px; color: #f0b429; font-size: 1.5em; letter-spacing: 2px; }
-#status { text-align: center; padding: 6px; color: #90adc4; font-size: 0.82em; min-height: 22px; }
-#bracket-wrap { overflow-x: auto; padding: 10px 10px 30px; }
-.full-bracket { display: flex; gap: 6px; min-width: 1600px; align-items: flex-start; }
+
+nav { display: flex; gap: 20px; justify-content: center; padding: 14px; border-bottom: 1px solid #1e2d4a; }
+nav a { color: #90adc4; text-decoration: none; font-size: 0.88em; letter-spacing: 1px; text-transform: uppercase; }
+nav a.active { color: #f0b429; border-bottom: 2px solid #f0b429; padding-bottom: 2px; }
+
+h1 { text-align: center; padding: 18px 10px 4px; color: #f0b429; font-size: 1.4em; letter-spacing: 1px; }
+#status { text-align: center; padding: 6px 12px; color: #90adc4; font-size: 0.8em; min-height: 22px; }
+#odds-note { text-align: center; color: #50d0a0; font-size: 0.75em; min-height: 18px; padding-bottom: 4px; padding: 0 12px 4px; }
+
+.legend { display: flex; gap: 14px; justify-content: center; padding: 6px; font-size: 0.75em; color: #6080a0; flex-wrap: wrap; }
+.legend span { display: flex; align-items: center; gap: 4px; }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.dot-win { background: #2a5a2a; } .dot-upset { background: #8b0000; } .dot-odds { background: #50d0a0; }
+
+/* --- Button row --- */
+.btn-row { display: flex; gap: 8px; justify-content: center; margin: 8px 0; flex-wrap: wrap; padding: 0 12px; }
+.resim-btn { padding: 8px 20px; background: #f0b429; color: #0a0e1a; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
+.resim-btn:hover { background: #ffd166; }
+.odds-btn { padding: 8px 20px; background: #1a3a2a; color: #50d0a0; border: 1px solid #50d0a0; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85em; }
+.odds-btn:hover { background: #1f4a35; }
+.odds-btn.active { background: #50d0a0; color: #0a0e1a; }
+.view-toggle { display: flex; background: #0d1525; border: 1px solid #2a3a5a; border-radius: 6px; overflow: hidden; }
+.view-toggle button { padding: 8px 16px; background: none; border: none; color: #6080a0; cursor: pointer; font-size: 0.82em; font-weight: bold; }
+.view-toggle button.active { background: #1e3050; color: #f0b429; }
+
+.model-note { text-align: center; color: #3a5070; font-size: 0.68em; padding: 4px 12px 14px; }
+
+/* ===================== BRACKET VIEW ===================== */
+#bracket-wrap { overflow-x: auto; padding: 10px 10px 30px; -webkit-overflow-scrolling: touch; }
+.scroll-hint { text-align: center; color: #3a5070; font-size: 0.72em; padding: 0 0 6px; display: none; }
+@media (max-width: 1400px) { .scroll-hint { display: block; } }
+
+.full-bracket { display: flex; gap: 6px; min-width: 1500px; align-items: flex-start; }
 .side { display: flex; gap: 0; flex: 1; }
 .side.right { flex-direction: row-reverse; }
-.round-col { display: flex; flex-direction: column; width: 178px; flex-shrink: 0; }
+.round-col { display: flex; flex-direction: column; width: 175px; flex-shrink: 0; }
 .round-header { text-align: center; font-size: 0.72em; color: #6080a0; letter-spacing: 1px; text-transform: uppercase; padding: 4px 0 6px; font-weight: bold; }
 .team-slot { display: flex; align-items: center; gap: 5px; padding: 5px 8px; background: #12192e; border: 1px solid #1e2d4a; margin: 1px 2px; border-radius: 4px; font-size: 0.8em; min-height: 30px; white-space: nowrap; overflow: hidden; }
 .team-slot.winner { background: #0f2010; border-color: #2a5a2a; }
@@ -23,47 +52,83 @@ h1 { text-align: center; padding: 18px 10px 4px; color: #f0b429; font-size: 1.5e
 .tname { flex: 1; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
 .elo-val { color: #c09020; font-size: 0.78em; flex-shrink: 0; }
 .odds-val { color: #50d0a0; font-size: 0.72em; flex-shrink: 0; font-weight: bold; }
-.upset-tag { background: #8b0000; color: #ffaaaa; font-size: 0.62em; padding: 1px 4px; border-radius: 2px; flex-shrink: 0; }
+.upset-tag { background: #8b0000; color: #ffaaaa; font-size: 0.6em; padding: 1px 3px; border-radius: 2px; flex-shrink: 0; }
 .center-col { display: flex; flex-direction: column; align-items: center; width: 210px; flex-shrink: 0; padding-top: 28px; }
 .ff-label { color: #f0b429; font-weight: bold; font-size: 0.8em; letter-spacing: 2px; text-align: center; margin: 10px 0 4px; }
 .ff-game { background: #0d1525; border: 1px solid #2a3a5a; border-radius: 6px; padding: 8px; width: 100%; margin-bottom: 6px; }
 .ff-sublabel { font-size: 0.65em; color: #4a6080; text-align: center; margin-bottom: 4px; }
 .champ-box { background: #0d1525; border: 2px solid #f0b429; border-radius: 8px; padding: 12px; width: 100%; margin-top: 10px; }
 .champ-footer { margin-top: 10px; border-top: 1px solid #2a3a5a; padding-top: 8px; text-align: center; }
-.legend { display: flex; gap: 14px; justify-content: center; padding: 6px; font-size: 0.75em; color: #6080a0; flex-wrap: wrap; }
-.legend span { display: flex; align-items: center; gap: 4px; }
-.dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.dot-win { background: #2a5a2a; } .dot-upset { background: #8b0000; } .dot-odds { background: #50d0a0; }
-.model-note { text-align: center; color: #3a5070; font-size: 0.7em; padding: 4px 0 14px; }
 .reg-div { text-align: center; font-size: 0.65em; color: #f0b429; font-weight: bold; letter-spacing: 1px; padding: 4px 0 2px; border-top: 1px solid #1e2d4a; margin-top: 3px; }
-.btn-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
-.resim-btn { padding: 8px 22px; background: #f0b429; color: #0a0e1a; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.88em; }
-.resim-btn:hover { background: #ffd166; }
-.odds-btn { padding: 8px 22px; background: #1a3a2a; color: #50d0a0; border: 1px solid #50d0a0; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.88em; }
-.odds-btn:hover { background: #1f4a35; }
-.odds-btn.active { background: #50d0a0; color: #0a0e1a; }
-#odds-note { text-align: center; color: #50d0a0; font-size: 0.75em; min-height: 18px; padding-bottom: 4px; }
+
+/* ===================== ROUNDS VIEW ===================== */
+#rounds-wrap { padding: 10px 12px 40px; display: none; }
+
+.round-tabs { display: flex; overflow-x: auto; gap: 4px; padding-bottom: 12px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.round-tabs::-webkit-scrollbar { display: none; }
+.round-tab { flex-shrink: 0; padding: 7px 14px; background: #0d1525; border: 1px solid #2a3a5a; border-radius: 20px; font-size: 0.78em; color: #6080a0; cursor: pointer; white-space: nowrap; font-weight: bold; }
+.round-tab.active { background: #f0b429; color: #0a0e1a; border-color: #f0b429; }
+
+.round-games { display: flex; flex-direction: column; gap: 10px; }
+.region-section { background: #0d1525; border: 1px solid #1e2d4a; border-radius: 8px; overflow: hidden; }
+.region-label { padding: 8px 14px; font-size: 0.72em; color: #f0b429; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; background: #0a1020; border-bottom: 1px solid #1e2d4a; }
+.matchup-card { display: flex; flex-direction: column; border-bottom: 1px solid #1e2d4a; }
+.matchup-card:last-child { border-bottom: none; }
+.m-team { display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 0.9em; }
+.m-team.winner { background: #0f2010; }
+.m-team.loser { opacity: 0.35; }
+.m-team.upset-winner { background: #2a0808; }
+.m-seed { color: #6080b0; font-weight: bold; min-width: 22px; text-align: right; font-size: 0.95em; }
+.m-name { flex: 1; font-weight: 500; }
+.m-record { color: #5070a0; font-size: 0.78em; }
+.m-odds { color: #50d0a0; font-size: 0.78em; font-weight: bold; }
+.m-elo { color: #c09020; font-size: 0.78em; }
+.m-upset { background: #8b0000; color: #ffaaaa; font-size: 0.62em; padding: 1px 5px; border-radius: 3px; }
+.matchup-divider { height: 1px; background: #1e2d4a; margin: 0 14px; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 700px) {
+  h1 { font-size: 1.1em; padding: 14px 8px 4px; }
+  .btn-row { gap: 6px; }
+  .resim-btn, .odds-btn { padding: 7px 14px; font-size: 0.8em; }
+  .view-toggle button { padding: 7px 12px; font-size: 0.78em; }
+}
 </style>
 </head>
 <body>
-<nav style="display:flex;gap:20px;justify-content:center;padding:14px;border-bottom:1px solid #1e2d4a;">
-  <a href="/" style="color:#f0b429;text-decoration:none;font-size:0.88em;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid #f0b429;padding-bottom:2px;">🏀 Bracket</a>
-  <a href="/how-it-works" style="color:#90adc4;text-decoration:none;font-size:0.88em;letter-spacing:1px;text-transform:uppercase;">📖 How It Works</a>
+
+<nav>
+  <a href="/" class="active">🏀 Bracket</a>
+  <a href="/how-it-works">📖 How It Works</a>
 </nav>
+
 <h1>🏀 2026 NCAA Men's Basketball Championship</h1>
 <div id="status"></div>
+
 <div class="legend">
   <span><span class="dot dot-win"></span> Winner</span>
   <span><span class="dot dot-upset"></span> Upset</span>
   <span>★ = Elo</span>
   <span><span class="dot dot-odds"></span> Champ %</span>
 </div>
+
 <div class="btn-row">
-  <button class="resim-btn" onclick="resim()">🔄 Re-Simulate Bracket</button>
+  <button class="resim-btn" onclick="resim()">🔄 Re-Simulate</button>
   <button class="odds-btn" id="oddsBtn" onclick="toggleOdds()">📊 Show Championship Odds</button>
+  <div class="view-toggle">
+    <button id="btnBracket" onclick="setView('bracket')" class="active">🗂 Bracket</button>
+    <button id="btnRounds" onclick="setView('rounds')">📋 Rounds</button>
+  </div>
 </div>
 <div id="odds-note"></div>
+
+<div class="scroll-hint">← Scroll to see full bracket →</div>
 <div id="bracket-wrap"></div>
+<div id="rounds-wrap">
+  <div class="round-tabs" id="round-tabs"></div>
+  <div class="round-games" id="round-games"></div>
+</div>
+
 <div class="model-note">Model: Win% (70%) · Seed strength (20%) · Upset factor (10%) · Based on 2025-26 records & seeds</div>
 
 <script>
@@ -146,6 +211,8 @@ const SEED_BASE = {1:1840,2:1760,3:1710,4:1665,5:1625,6:1595,7:1565,8:1535,9:151
 
 let championshipOdds = {};
 let showOdds = false;
+let currentView = window.innerWidth < 700 ? 'rounds' : 'bracket';
+let lastSim = null;
 
 function calcElo(t) {
   const base = SEED_BASE[t.seed] || 1300;
@@ -167,9 +234,7 @@ const R1_PAIRS = [[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15]];
 
 function simGame(a, b, rnd) {
   const pA = 1 / (1 + Math.exp(-(a.elo - b.elo) / 120));
-  const favSeed = Math.min(a.seed, b.seed);
-  const dogSeed = Math.max(a.seed, b.seed);
-  const gap = dogSeed - favSeed;
+  const gap = Math.max(a.seed, b.seed) - Math.min(a.seed, b.seed);
   const upsetProb = rnd <= 1 ? (gap===5?0.20 : gap===6?0.18 : gap===7?0.15 : gap===4?0.14 : 0) : 0;
   let winner, loser, isUpset = false;
   if (upsetProb > 0 && Math.random() < upsetProb) {
@@ -187,8 +252,8 @@ function simGame(a, b, rnd) {
 }
 
 function simRegion(teams) {
-  const r1 = R1_PAIRS.map(([i,j]) => simGame(teams[i], teams[j], 0));
-  const r2 = [[0,1],[2,3],[4,5],[6,7]].map(([i,j]) => simGame(r1[i].winner, r1[j].winner, 1));
+  const r1  = R1_PAIRS.map(([i,j]) => simGame(teams[i], teams[j], 0));
+  const r2  = [[0,1],[2,3],[4,5],[6,7]].map(([i,j]) => simGame(r1[i].winner, r1[j].winner, 1));
   const s16 = [[0,1],[2,3]].map(([i,j]) => simGame(r2[i].winner, r2[j].winner, 2));
   const e8  = [simGame(s16[0].winner, s16[1].winner, 3)];
   return {r1, r2, s16, e8, winner: e8[0].winner};
@@ -220,19 +285,29 @@ function toggleOdds() {
       document.getElementById('oddsBtn').textContent = '✅ Odds On — Click to Hide';
       const top = Object.entries(championshipOdds).sort((a,b) => b[1]-a[1]).slice(0,3)
         .map(([n,p]) => `${n} ${p}%`).join(' · ');
-      document.getElementById('odds-note').textContent = `Top picks: ${top} — green % shows each team's chance to win it all`;
-      resim();
+      document.getElementById('odds-note').textContent = `Top picks: ${top} — green % = chance to win it all`;
+      render();
     }, 10);
   } else {
     showOdds = false;
     document.getElementById('oddsBtn').classList.remove('active');
     document.getElementById('oddsBtn').textContent = '📊 Show Championship Odds';
     document.getElementById('odds-note').textContent = '';
-    resim();
+    render();
   }
 }
 
-// --- Render ---
+function setView(v) {
+  currentView = v;
+  document.getElementById('btnBracket').classList.toggle('active', v === 'bracket');
+  document.getElementById('btnRounds').classList.toggle('active', v === 'rounds');
+  document.getElementById('bracket-wrap').style.display = v === 'bracket' ? 'block' : 'none';
+  document.getElementById('rounds-wrap').style.display  = v === 'rounds'  ? 'block' : 'none';
+  document.querySelector('.scroll-hint').style.display  = v === 'bracket' ? '' : 'none';
+  if (lastSim) renderRounds(lastSim.sim, lastSim.ff1, lastSim.ff2, lastSim.champ);
+}
+
+// ==================== BRACKET RENDER ====================
 function slotEl(t, win) {
   const d = document.createElement("div");
   d.className = "team-slot" + (win ? (t.upset ? " upset-winner" : " winner") : " loser");
@@ -282,7 +357,6 @@ function renderBracket(sim, ff1, ff2, champ) {
   const center = document.createElement("div"); center.className="center-col";
   const ffLbl = document.createElement("div"); ffLbl.className="ff-label"; ffLbl.textContent="🏟️ FINAL FOUR";
   center.appendChild(ffLbl);
-
   [["East vs West", ff1],["South vs Midwest", ff2]].forEach(([lbl,g]) => {
     const box = document.createElement("div"); box.className="ff-game";
     const sub = document.createElement("div"); sub.className="ff-sublabel"; sub.textContent=lbl;
@@ -291,19 +365,110 @@ function renderBracket(sim, ff1, ff2, champ) {
 
   const cLbl = document.createElement("div"); cLbl.className="ff-label"; cLbl.style.marginTop="14px"; cLbl.textContent="🏆 CHAMPIONSHIP";
   center.appendChild(cLbl);
-
   const cBox = document.createElement("div"); cBox.className="champ-box";
   cBox.appendChild(gameEl(champ));
   const cFoot = document.createElement("div"); cFoot.className="champ-footer";
-  const champOdds = showOdds && championshipOdds[champ.winner.name] ? ` · ${championshipOdds[champ.winner.name]}% odds` : '';
+  const co = showOdds && championshipOdds[champ.winner.name] ? ` · ${championshipOdds[champ.winner.name]}% odds` : '';
   cFoot.innerHTML=`<div style="color:#6080a0;font-size:0.68em;letter-spacing:2px;">2026 CHAMPION</div>
     <div style="color:#f0b429;font-size:1.2em;font-weight:bold;margin-top:3px;">${champ.winner.name}</div>
-    <div style="color:#90adc4;font-size:0.75em;">Seed #${champ.winner.seed} · Elo ${champ.winner.elo}${champOdds}</div>`;
+    <div style="color:#90adc4;font-size:0.75em;">Seed #${champ.winner.seed} · Elo ${champ.winner.elo}${co}</div>`;
   cBox.appendChild(cFoot); center.appendChild(cBox);
-
   full.appendChild(left); full.appendChild(center); full.appendChild(right);
   wrap.appendChild(full);
+}
 
+// ==================== ROUNDS RENDER ====================
+const ROUND_DEFS = [
+  { key: 'r1',   label: '1st Round' },
+  { key: 'r2',   label: '2nd Round' },
+  { key: 's16',  label: 'Sweet 16'  },
+  { key: 'e8',   label: 'Elite 8'   },
+  { key: 'ff',   label: 'Final Four'},
+  { key: 'champ',label: 'Championship'},
+];
+const REGIONS = ['east','west','south','midwest'];
+const REG_LABELS = {east:'East', west:'West', south:'South', midwest:'Midwest'};
+let activeRoundKey = 'r1';
+
+function mTeamEl(t, win) {
+  const d = document.createElement("div");
+  d.className = "m-team" + (win ? (t.upset ? " upset-winner" : " winner") : " loser");
+  const odds = showOdds && championshipOdds[t.name] ? `<span class="m-odds">${championshipOdds[t.name]}%</span>` : '';
+  d.innerHTML = `<span class="m-seed">${t.seed}</span>
+    <span class="m-name">${t.name}</span>
+    ${t.upset ? '<span class="m-upset">UPSET</span>' : ''}
+    <span class="m-record">${t.w}-${t.l}</span>
+    ${odds}
+    <span class="m-elo">★${t.elo}</span>`;
+  return d;
+}
+
+function mGameEl(g) {
+  const card = document.createElement("div"); card.className = "matchup-card";
+  card.appendChild(mTeamEl(g.winner, true));
+  const div = document.createElement("div"); div.className = "matchup-divider";
+  card.appendChild(div);
+  card.appendChild(mTeamEl(g.loser, false));
+  return card;
+}
+
+function renderRounds(sim, ff1, ff2, champ) {
+  // Build tabs
+  const tabsEl = document.getElementById('round-tabs');
+  tabsEl.innerHTML = '';
+  ROUND_DEFS.forEach(({key, label}) => {
+    const btn = document.createElement("button");
+    btn.className = "round-tab" + (key === activeRoundKey ? " active" : "");
+    btn.textContent = label;
+    btn.onclick = () => { activeRoundKey = key; renderRounds(sim, ff1, ff2, champ); };
+    tabsEl.appendChild(btn);
+  });
+
+  const gamesEl = document.getElementById('round-games');
+  gamesEl.innerHTML = '';
+
+  if (activeRoundKey === 'ff') {
+    const section = document.createElement("div"); section.className = "region-section";
+    const lbl = document.createElement("div"); lbl.className = "region-label"; lbl.textContent = "Final Four";
+    section.appendChild(lbl);
+    [["East vs West", ff1], ["South vs Midwest", ff2]].forEach(([matchupLbl, g]) => {
+      const sub = document.createElement("div");
+      sub.style.cssText = "font-size:0.72em;color:#4a6080;padding:8px 14px 0;text-transform:uppercase;letter-spacing:1px;";
+      sub.textContent = matchupLbl;
+      section.appendChild(sub);
+      section.appendChild(mGameEl(g));
+    });
+    gamesEl.appendChild(section);
+    return;
+  }
+
+  if (activeRoundKey === 'champ') {
+    const section = document.createElement("div"); section.className = "region-section";
+    const lbl = document.createElement("div"); lbl.className = "region-label"; lbl.textContent = "🏆 Championship Game";
+    section.appendChild(lbl);
+    section.appendChild(mGameEl(champ));
+    const foot = document.createElement("div");
+    const co = showOdds && championshipOdds[champ.winner.name] ? ` · ${championshipOdds[champ.winner.name]}% odds` : '';
+    foot.style.cssText = "text-align:center;padding:12px;color:#f0b429;font-weight:bold;font-size:1em;";
+    foot.innerHTML = `🏆 2026 Champion: ${champ.winner.name}<br><span style="color:#90adc4;font-size:0.78em;font-weight:normal;">Seed #${champ.winner.seed} · ${champ.winner.w}-${champ.winner.l}${co}</span>`;
+    section.appendChild(foot);
+    gamesEl.appendChild(section);
+    return;
+  }
+
+  REGIONS.forEach(reg => {
+    const games = sim[reg][activeRoundKey];
+    if (!games || !games.length) return;
+    const section = document.createElement("div"); section.className = "region-section";
+    const lbl = document.createElement("div"); lbl.className = "region-label"; lbl.textContent = REG_LABELS[reg];
+    section.appendChild(lbl);
+    games.forEach(g => section.appendChild(mGameEl(g)));
+    gamesEl.appendChild(section);
+  });
+}
+
+// ==================== STATUS ====================
+function updateStatus(sim, ff1, ff2, champ) {
   let upsets = 0;
   for (const reg of Object.values(sim)) {
     for (const round of [reg.r1, reg.r2, reg.s16, reg.e8]) round.forEach(g => { if(g.isUpset) upsets++; });
@@ -313,6 +478,14 @@ function renderBracket(sim, ff1, ff2, champ) {
     `Champion: ${champ.winner.name} (${champ.winner.w}-${champ.winner.l}) · ${upsets} upset${upsets!==1?'s':''} picked · Click Re-Simulate for a new bracket`;
 }
 
+function render() {
+  if (!lastSim) return;
+  const {sim, ff1, ff2, champ} = lastSim;
+  renderBracket(sim, ff1, ff2, champ);
+  renderRounds(sim, ff1, ff2, champ);
+  updateStatus(sim, ff1, ff2, champ);
+}
+
 function resim() {
   const teams = buildTeams();
   const sim = {};
@@ -320,9 +493,12 @@ function resim() {
   const ff1   = simGame(sim.east.winner,  sim.west.winner,    4);
   const ff2   = simGame(sim.south.winner, sim.midwest.winner, 4);
   const champ = simGame(ff1.winner, ff2.winner, 5);
-  renderBracket(sim, ff1, ff2, champ);
+  lastSim = {sim, ff1, ff2, champ};
+  render();
 }
 
+// Init
+setView(currentView);
 resim();
 </script>
 </body>
